@@ -368,7 +368,7 @@ class AccountFiscalyearClosingConfig(models.Model):
     date = fields.Date(string="Move date")
     enabled = fields.Boolean(default=True)
     journal_id = fields.Many2one(required=True)
-    move_id = fields.Many2one(comodel_name="account.move", string="Move")
+    move_id = fields.Many2one(comodel_name="account.move")
 
     _code_uniq = models.Constraint(
         "unique(code, fyc_id)",
@@ -470,10 +470,10 @@ class AccountFiscalyearClosingConfig(models.Model):
         if config.move_id:
             move_ids = config.move_id._reverse_moves(
                 [
-                    dict(
-                        date=date,
-                        journal_id=self.journal_id.id,
-                    )
+                    {
+                        "date": date,
+                        "journal_id": self.journal_id.id,
+                    }
                 ]
             )
         return move_ids.ids
@@ -534,16 +534,14 @@ class AccountFiscalyearClosingMapping(models.Model):
                 vals["dest_account_id"], list
             ):
                 vals["dest_account_id"] = vals["dest_account_id"][0]
-        res = super().create(vals_list)
-        return res
+        return super().create(vals_list)
 
     def write(self, vals):
         if vals.get("dest_account_id", False) and isinstance(
             vals["dest_account_id"], list
         ):
             vals["dest_account_id"] = vals["dest_account_id"][0]
-        res = super().write(vals)
-        return res
+        return super().write(vals)
 
     def dest_move_line_prepare(self, dest, balance, partner_id=False):
         self.ensure_one()

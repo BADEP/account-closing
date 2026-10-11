@@ -144,7 +144,7 @@ class TestAccountFiscalYearClosing(AccountTestInvoicingCommon):
         )
 
     def create_simple_invoice(self, date, partner, inv_type):
-        invoice = self.env["account.move"].create(
+        return self.env["account.move"].create(
             {
                 "partner_id": partner.id,
                 "move_type": inv_type,
@@ -175,7 +175,6 @@ class TestAccountFiscalYearClosing(AccountTestInvoicingCommon):
                 ],
             }
         )
-        return invoice
 
     def test_account_closing(self):
         # create a supplier invoice
@@ -352,7 +351,7 @@ class TestAccountFiscalYearClosing(AccountTestInvoicingCommon):
         res = fy_closing.button_calculate()
         if res and isinstance(res, dict) and res.get("name", False):
             self.assertFalse(
-                ("Unbalanced journal entry found" == res["name"]),
+                (res["name"] == "Unbalanced journal entry found"),
                 "There are unbalanced move/s in the closing moves!",
             )
 
